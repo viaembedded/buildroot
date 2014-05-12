@@ -1,0 +1,12 @@
+BR2_arm=y
+BR2_cortex_a9=y
+
+# Kernel Header Options
+BR2_KERNEL_HEADERS_3_0=y
+
+# getty options
+BR2_TARGET_GENERIC_GETTY_PORT="tty0"
+
+# initramfs needs a Linux kernel to be built
+BR2_TARGET_ROOTFS_TAR=y
+BR2_TARGET_ROOTFS_TAR_GZIP=y
