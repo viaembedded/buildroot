@@ -1,0 +1,5 @@
+set loadaddr 0x10800000
+set kernel uImage
+set hdmi video=mxcfb0:dev=hdmi,1920x1080M@60,bpp=32
+set bootargs console=ttymxc1,115200 console=tty1,115200 ${hdmi} root=/dev/mmcblk1p2 rootwait rw
+mmc dev 0; ext2load mmc 0:1 ${loadaddr} ${kernel} && bootm ; echo "Error loading kernel image"

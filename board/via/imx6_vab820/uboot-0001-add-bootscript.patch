@@ -1,0 +1,44 @@
+From 029eae9870057300547e41bd3e289132a35d4467 Mon Sep 17 00:00:00 2001
+From: Gergely Imreh <imrehg@gmail.com>
+Date: Thu, 22 Jan 2015 14:19:53 +0800
+Subject: [PATCH] vab820: modify default bootcmd to look for 6x_bootscript on
+ the first partition
+
+Previously it is not possible to supply the relevant u-boot parameters on the
+SD card or eMMC storage, but they are always either read from the compiled-in
+parameters, or the SPI flash.
+
+This modification is based on the Boundary Devices Nitrogen6X board's parameters.
+https://github.com/boundarydevices/u-boot-imx6/blob/77ab23a8670d5d05679a168f595ab11c3cea034b/include/configs/mx6_r.h#L175-L191
+---
+ include/configs/mx6q_sabrelite.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/mx6q_sabrelite.h b/include/configs/mx6q_sabrelite.h
+index 987df11..73b762e 100644
+--- a/include/configs/mx6q_sabrelite.h
++++ b/include/configs/mx6q_sabrelite.h
+@@ -170,7 +170,19 @@
+ 		"bootcmd_mmc=run bootargs_base bootargs_mmc; mmc dev 1; ext2load mmc 1:1 $loadaddr $vkernel && bootm\0"   \
+ 		"bootargs_sd=setenv bootargs ${bootargs} root=/dev/mmcblk1p1 rootwait rw\0"     \
+ 		"bootcmd_sd=run bootargs_base bootargs_sd; mmc dev 0; ext2load mmc 0:1 $loadaddr $vkernel && bootm\0"   \
+-		"bootcmd=run bootcmd_mmc\0"
++		"bootcmd=for disk in 0 1 " \
++		   "; do "\
++                     " mmc dev ${disk} ;" \
++		     "for fs in fat ext2 ; do " \
++		       "${fs}load "  \
++		         "mmc ${disk}:1 "  \
++		         "10008000 " \
++		         "/6x_bootscript" \
++		         "&& source 10008000 ; " \
++		     "done ; " \
++		  "done ; " \
++		"echo ; echo 6x_bootscript not found ;\0" \
++
+ #endif
+ 
+ #define CONFIG_ARP_TIMEOUT	200UL
+-- 
+2.2.2
+
